@@ -1,4 +1,4 @@
-import { ADD_USER, ADD_USERS, DELETE_USER, DETAILS_USER, REJECT_USER } from "../actions/user.action"
+import { ADD_USER, ADD_USERS, DELETE_USER, DETAILS_USER, REJECT_USER, FETCH_USERS_FAILURE } from "../actions/user.action"
 
 const initState = {
     users: []
@@ -24,7 +24,14 @@ const UserReducer = (state = initState, action) => {
                         return Object.assign({}, user, { image: "-" });
                     return user
                 })
-            })
+            });
+
+        case FETCH_USERS_FAILURE:
+            return {
+                ...state,
+                error: action.payload.error,
+                users: []
+              };
         default:
             return state
     }
