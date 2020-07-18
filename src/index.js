@@ -1,1 +1,3 @@
-require("./alert.js");
+import greeting from './robot'
+
+document.write(greeting("Hi", "Alex"))
