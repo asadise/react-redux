@@ -1,3 +1,5 @@
+var ExtractTextPlugin = require('extract-text-webpack-plugin');
+
 module.exports = {
     entry: './src',
     output: {
@@ -10,7 +12,15 @@ module.exports = {
                 test: /\.js/,
                 loader: 'babel-loader',
                 include: __dirname + '/src',
-            }
+            },
+            {
+                test: /\.css$/,
+                loader: "style-loader!css-loader"
+            },
         ],
-    }
+    },
+    plugins: [
+        new ExtractTextPlugin("styles.css")
+    ]
+
 };
