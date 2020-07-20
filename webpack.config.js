@@ -4,7 +4,7 @@ var data = require('./data');
 
 module.exports = {
     mode: 'development',
-    entry: './src',
+    entry: './src/router',
     output: {
         globalObject: "this",
         path: __dirname + '/build',
@@ -14,9 +14,11 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.js/,
-                loader: 'babel-loader',
-                include: __dirname + '/src',
+                test: /\.(js|jsx)$/,
+                exclude: /node_modules/,
+                use: {
+                    loader: 'babel-loader'
+                }
             },
             {
                 test: /\.css$/,
