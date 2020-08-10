@@ -1,0 +1,144 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        td {
+  color: white;
+  padding: 0 20px;
+  background: grey;
+}
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.10.3/babel.min.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/16.1.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/16.1.1/umd/react-dom.production.min.js"></script>
+    <script type="text/babel">
+
+const PATH_BASE = 'http://my-json-server.typicode.com/asadise/book-api';
+const PARAM_SEARCH = '/books';
+const PARAM_PAGE = '_limit=2&_page=';
+
+function isEmpty(obj) {
+  return !obj || Object.keys(obj).length === 0;
+}
+
+class App extends React.Component {
+    _isMounted = false;
+  constructor(props) {
+    super(props);
+    this.state = {
+      result: null,
+      searchTerm: '',
+      page: 1,
+      error: null,
+      isLoading: false,
+    }
+    this.onDismiss = this.onDismiss.bind(this);
+    this.onSearchSubmit = this.onSearchSubmit.bind(this);
+    this.fetchSearchTopStories = this.fetchSearchTopStories.bind(this);
+    this.setSearchTopStories = this.setSearchTopStories.bind(this);
+    this.onChangeSearch = this.onChangeSearch.bind(this);
+  }
+
+  onSearchSubmit(event) {
+    const { searchTerm } = this.state;
+    this.fetchSearchTopStories(searchTerm);
+    event.preventDefault();
+  }
+
+  fetchSearchTopStories(searchTerm = '', page = 1) {
+    this.setState({ isLoading: true });
+    const url = (searchTerm) ? `${PATH_BASE}${PARAM_SEARCH}/${searchTerm}` : `${PATH_BASE}${PARAM_SEARCH}?${PARAM_PAGE}` + page;
+    fetch(url)
+      .then(response => response.json())
+      .then(result => this._isMounted && this.setSearchTopStories(result, searchTerm, page))
+      .catch(error => this._isMounted && his.setState({ error }) );
+  }
+
+  setSearchTopStories(result, searchTerm, page) {
+    let oldResult = (this.state.result) ? this.state.result : [];
+    if (searchTerm !== '') {
+      oldResult = [];
+      page = -1;
+    }
+    //if result is an object instead of array
+    let resultArray = [];
+    if (!isEmpty(result) && result.length === undefined)
+      resultArray.push(result);
+    else if (!isEmpty(result))
+      resultArray = result;
+
+    const upldatedResult = [...oldResult, ...resultArray];
+    this.setState({ result: upldatedResult, searchTerm: searchTerm, page: page, isLoading: false })
+  }
+
+  onChangeSearch(event) {
+    this.setState({ searchTerm: event.target.value });
+  }
+
+  componentDidMount() {
+    this._isMounted = true;
+    this.fetchSearchTopStories();
+  }
+
+  onDismiss(id) {
+    const isNot = item => item.id !== id;
+    const upldatedResult = this.state.result.filter(isNot);
+    /* const upldatedList = this.state.list.filter(function (listItem) {
+      return listItem.id !== id;
+    }); */
+    /*this.setState({ result: Object.assign({}, this.state.result, { books: upldatedResult }) })
+      const userNames = { firstname: 'Robin', lastname: 'Wieruch' }; const userAge = { age: 28 };
+      const user = { ...userNames, ...userAge };
+    */
+    this.setState({ result: upldatedResult })
+  }
+
+  render() {
+    let hi = 'گودریدز | Goodreads ';
+    const { result, searchTerm, page, error, isLoading } = this.state;
+
+    if (error)
+      return <div className="App" style={{ textAlign: "center" }}><h3>خطایی در فراخوانی وب‌سرویس رخ داده است.</h3><span>جزئیات: {error.toString()}</span></div>
+
+    return (
+      <div className="App">
+        <div className="page">
+          <div className="intersection">
+            <h2>{hi}</h2>
+            <div className="table">
+                    {(result) ? result.map((item, index) =>
+                        <div key={item.id} className="table-row">
+                            <span style={{ width: '10%' }}>
+                                <img width="30" alt="cover" src={item.image} />
+                            </span>
+                            <span style={{ width: '30%' }}>
+                                {index}. <a target="_blank" rel="noopener noreferrer" href={item.url}>{item.title.split("-")[0]}</a>
+                            </span>
+                            <span style={{ width: '20%' }}>{item.title.split("-")[1]}</span>
+                            <span style={{ width: '20%' }}> {item.title.length / 10}</span>
+                            <br /><br />
+                        </div>
+                    ) : null}
+                </div>
+            {isLoading ? <Loading /> : ""}
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+
+const Loading = () =>
+  <div style={{ textAlign: "center" }}>
+    در حال بارگزاری؛ لطفا صبر کنید...
+  </div>
+
+ReactDOM.render(<App />, document.getElementById('root'))
+    </script>
+</body>
+</html>
